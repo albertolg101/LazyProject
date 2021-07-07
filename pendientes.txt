@@ -1,0 +1,47 @@
+Cosas para programar
+	
+	-Pensar en la posicion de los estados en la matriz 8x8
+
+	-Apagar y encender la luz del techo
+	-Apagar y encender la luz de la mesa
+	-Apagar y encender ampli
+	-Controlar la velocidad del ventilador [0, 3]
+	-Agregar estados en la matriz 8x8
+	-Modo Mostrar Hora
+	-Modo Cambiar Hora
+	-Modo Ajustar Alarma
+	-Modo PC
+		-Encender equipo
+		-Apagar equipo
+		-Controlar el volumen de la computadora
+		-Mute/Unmute
+		-[Up Arrow] & [Down Arrow] & [Left Arrow] & [Right Arrow]
+		-[Enter]
+		-[Home+Tab]
+		-[Home+PrintScreen]
+		-Cambio de escritorio
+		-[PageUp] & [PageDown]
+		-[Alt+F4]
+		-[Shift+U](Modo aleatorio en Aimp)
+		-['['] & [']'] (Atrazary adelantar subtitulos MPC-HC)
+		-[Ctrl + Left Arrow] & [Ctrl + Right Arrow]
+
+	-Programar Protocolos
+		-Protocolo "contest"
+		-Protocolo "Buenas noches"
+		-Protocolo "Buenos dias"
+
+Mando funciones:
+	Modo TV:
+		002 - ON/OFF Roof Light
+		025 - ON/OFF Desktop Light
+		021 - ON/OFF Ampli
+		005 - Fan Speed
+		009 - OFF Fan
+		004 - Matrix Change State
+		003 - Option
+
+Tareas:
+
+	-Lograr compilar sdk del aimp
+	-Averiguar como saber cuando se presionan ciertas teclas

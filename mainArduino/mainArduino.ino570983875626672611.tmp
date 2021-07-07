@@ -1,0 +1,129 @@
+#include <TimeLib.h>
+#include <IRremote.h>
+
+#define RECV_PIN 14
+#define PC_ON_PIN 15
+#define AMPLI_PIN 16
+#define DESKTOP_LIGHT_PIN 17
+#define ROOF_LIGHT_PIN 18
+#define TERMOMETER_PIN A5
+
+#include "matrix.h"
+#include "functions.h"
+
+int ActualTemperature;
+time_t lastTemperatureTime, 
+       lastConnectionUpdate;
+
+IRrecv irrecv(RECV_PIN);
+decode_results IRresults;
+
+void setup() {
+    Serial.begin(9600);
+    {
+      int _row[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+      initMatrix(12, 11, 10, _row);
+    }
+
+    pinMode(PC_ON_PIN, OUTPUT);
+    pinMode(AMPLI_PIN, OUTPUT);
+    pinMode(DESKTOP_LIGHT_PIN, OUTPUT);
+    pinMode(ROOF_LIGHT_PIN, OUTPUT);
+
+    submitFunction(1009); //Apagar Ventilador
+
+    setTime(20,25,0,23,4,2021);
+
+    irrecv.enableIRIn();
+
+    ActualTemperature = Temperature();
+}
+
+void loop() {
+  
+    if(irrecv.decode(&IRresults) and IRresults.decode_type == SONY)
+    {        
+        switch(IRresults.value)
+        {
+            case 0xA90:   //Switch Roof Light
+                submitFunction(1002, 1);
+                break;
+                
+            case 0xA50:   //Switch Desktop Light
+                submitFunction(1025, 1);
+                break;
+  
+            case 0x290:   //Switch Amplificator
+                submitFunction(1021, 1);
+                break;
+                
+            case 0x90:    //Fan Speed
+                submitFunction(1005);
+                break;
+  
+            case 0x890:   //Fan OFF
+                submitFunction(1009);
+                break;
+
+            case 0x96BCA: //Change Matrix Mode
+                submitFunction(2004, 1);
+                break;
+
+            case 0xA8BCA: //Switch PC
+                submitFunction(2002, 3);
+                break;
+        }
+    }
+
+    irrecv.resume(); // empezamos una nueva recepción
+    
+    byte len = 0;
+    char commandFromSerial[31];
+
+    if(Serial.available() > 0)
+    {
+        len = Serial.readBytesUntil('#', (char *)commandFromSerial, 30) ;
+        commandFromSerial[len] = '\0';
+
+        if(strcmp(commandFromSerial, "HelloArduino") == 0)
+        {
+            __PcON__.state = true;
+            Serial.print("OK");
+        }
+        
+        else if(commandFromSerial[0] == 'c' and commandFromSerial[1] == 'u')
+        {
+            __TPLinkConection__.state = (commandFromSerial[2] == '1');
+            __ETECSAConection__.state = (commandFromSerial[3] == '1');
+            __IntranetConection__.state = (commandFromSerial[4] == '1');
+            __InternetConection__.state = (commandFromSerial[5] == '1');
+            __Person1Conection__.state = (commandFromSerial[6] == '1');
+            __Person2Conection__.state = (commandFromSerial[7] == '1');
+        }
+    }
+
+    if(__PcON__.state and now() - lastConnectionUpdate >= 30)
+    {
+        submitFunction(3001); // Connection Update
+        lastConnectionUpdate = now();
+    }
+    
+    if(now() - lastTemperatureTime >= 5)
+    {
+        ActualTemperature = Temperature();
+        lastTemperatureTime = now();
+    }
+    
+    switch(matrixMode)
+    {
+        case 1:
+            setToInfoMode(ActualTemperature);
+            break;
+
+        case 2:
+            setToClockMode(hour(now()), minute(now()), second(now()));
+            break;
+    }
+    
+    printMatrix();
+}

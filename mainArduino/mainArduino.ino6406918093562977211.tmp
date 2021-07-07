@@ -1,0 +1,39 @@
+#include "matrix.h"
+
+int led = 13;
+char caracter[5];
+String comando;
+
+void setup() {
+  {
+    int _row[8] = {2, 3, 4, 5, 6, 7, 8, 9};
+    initMatrix(12, 11, 10, _row);
+  }
+
+  Serial.begin(9600);
+
+  for(int i = 0 ; i < 8 ; i++)
+    for(int j = 0 ; j < 7 ; j++)
+      mainMatrix[i][j] = true;
+  
+  pinMode(led, OUTPUT);
+}
+
+void loop() {
+
+  if(Serial.available())
+  {
+    for(int i = 0 ; i < 4 ; i++)
+    {
+      caracter[i] = Serial.read();
+      delay(100);
+    }
+  }
+
+  if(caracter[0] == 'a' and caracter[1] == 'l')
+    digitalWrite(led, HIGH);
+
+  if(caracter[0] == 'b' and caracter[1] == 'l')
+    digitalWrite(led, LOW);
+ 
+}

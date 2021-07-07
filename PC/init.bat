@@ -1,0 +1,1 @@
+start /MIN "TheLazyProject" main.exe
